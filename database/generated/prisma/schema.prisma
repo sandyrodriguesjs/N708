@@ -1,0 +1,134 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================
+//  Usuários
+// ============================
+model usuarios {
+  id_usuario    Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  status        String // ❗ Agora obrigatório
+  data_cadastro DateTime @default(now())
+
+  // Relacionamentos
+  emprestimos emprestimos[]
+  reservas    reservas[]
+  avaliacoes  avaliacoes[]
+  historico   historico[]
+}
+
+// ============================
+//  Livros
+// ============================
+model livros {
+  id_livro       Int    @id @default(autoincrement())
+  isbn           String @unique
+  titulo         String
+  autor          String
+  editora        String
+  ano_publicacao Int
+  sinopse        String // ❗ Agora obrigatório (tipo text no banco, mas em Prisma é String)
+
+  // Relacionamentos
+  exemplares exemplares[]
+  reservas   reservas[]
+  avaliacoes avaliacoes[]
+}
+
+// ============================
+//  Exemplares
+// ============================
+model exemplares {
+  id_exemplar     Int    @id @default(autoincrement())
+  id_livro        Int
+  codigo_exemplar String @unique
+  status          String // ❗ Agora obrigatório
+
+  // Relacionamentos
+  livro       livros        @relation(fields: [id_livro], references: [id_livro])
+  emprestimos emprestimos[]
+  historico   historico[]
+}
+
+// ============================
+//  Empréstimos
+// ============================
+model emprestimos {
+  id_emprestimo           Int      @id @default(autoincrement())
+  id_usuario              Int
+  id_exemplar             Int
+  data_retirada           DateTime
+  data_prevista_devolucao DateTime
+  data_devolucao          DateTime
+  renovado                Boolean // ❗ Agora obrigatório
+
+  // Relacionamentos
+  usuario  usuarios   @relation(fields: [id_usuario], references: [id_usuario])
+  exemplar exemplares @relation(fields: [id_exemplar], references: [id_exemplar])
+}
+
+// ============================
+//  Reservas
+// ============================
+model reservas {
+  id_reserva   Int      @id @default(autoincrement())
+  id_usuario   Int
+  id_livro     Int
+  data_reserva DateTime
+  status       String // ❗ Agora obrigatório
+  posicao_fila Int
+
+  // Relacionamentos
+  usuario usuarios @relation(fields: [id_usuario], references: [id_usuario])
+  livro   livros   @relation(fields: [id_livro], references: [id_livro])
+}
+
+// ============================
+//  Avaliações
+// ============================
+model avaliacoes {
+  id_avaliacao   Int      @id @default(autoincrement())
+  id_usuario     Int
+  id_livro       Int
+  nota           Int
+  comentario     String
+  data_avaliacao DateTime @default(now())
+
+  // Relacionamentos
+  usuario usuarios @relation(fields: [id_usuario], references: [id_usuario])
+  livro   livros   @relation(fields: [id_livro], references: [id_livro])
+}
+
+// ============================
+//  Histórico de ações
+// ============================
+model historico {
+  id_historico Int      @id @default(autoincrement())
+  id_usuario   Int
+  id_exemplar  Int
+  acao         String
+  data_acao    DateTime @default(now())
+
+  // Relacionamentos
+  usuario  usuarios   @relation(fields: [id_usuario], references: [id_usuario])
+  exemplar exemplares @relation(fields: [id_exemplar], references: [id_exemplar])
+}
+
+// ============================
+//  Gerador de Diagrama ER
+// ============================
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.svg"
+}
