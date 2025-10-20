@@ -7,13 +7,13 @@ import { getBooksController } from "../controllers/GetBooksController";
 const router = Router();
 const prisma = new PrismaClient();
 
-// 📚 Listar todos os livros
+//Listar todos os livros
 router.get("/livros", (req, res) => getBooksController.listAll(req, res));
 
-// 📘 Listar livro por ID
+//Listar livro por ID
 router.get("livros/:id", (req, res) => getBooksController.listById(req, res));
 
-// ➕ Cadastrar novo livro
+//Cadastrar novo livro
 router.post("/", (req, res) => createBookController.handle(req, res));
 
 export default router;
