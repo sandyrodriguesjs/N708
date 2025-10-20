@@ -2,15 +2,18 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "API backend da biblioteca com Node.js, TypeScript e Prisma",
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node src/server.ts",
+    "dev": "tsx --watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate"
   },
+  "prisma": {
+    "schema": "../database/prisma/schema.prisma"
+  },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,6 +24,7 @@
     "@types/node": "^24.8.1",
     "prisma": "^6.17.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
   "dependencies": {
