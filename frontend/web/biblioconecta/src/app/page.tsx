@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -50,7 +49,7 @@ export default function Login() {
         </button>
 
         <Link
-          href="/registerPage"
+          href="pages/registerPage"
           className="text-sky-500 font-medium hover:underline hover:text-sky-600 transition"
         >
           <button
