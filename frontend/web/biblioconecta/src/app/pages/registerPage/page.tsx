@@ -2,11 +2,46 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import api from "../../../api/axios";// ajuste o caminho se necessário
 
 export default function Register() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      // 🚀 Envia para o backend
+      const response = await api.post("/register", {
+        name,
+        email,
+        password,
+      });
+
+      setSuccess("Usuário cadastrado com sucesso!");
+      setTimeout(() => router.push("/"), 1500); // Redireciona para o login
+
+      console.log(response.data);
+    } catch (err: any) {
+      console.error(err);
+      setError(
+        err.response?.data?.erro || "Erro ao cadastrar. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3f8fb] px-6">
@@ -14,42 +49,57 @@ export default function Register() {
         Cadastre-se!
       </h1>
 
-      {/* Formulário */}
-      <form className="flex flex-col gap-4 w-full max-w-xs">
-        {/* Campo de e-mail */}
+      <form onSubmit={handleRegister} className="flex flex-col gap-4 w-full max-w-xs">
+        {/* Nome */}
         <div className="flex items-center border border-gray-400 rounded-lg px-3 py-2 bg-white">
-          {/* <Mail className="w-5 h-5 text-gray-500 mr-2" /> */}
+          <input
+            type="text"
+            placeholder="Seu nome"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div className="flex items-center border border-gray-400 rounded-lg px-3 py-2 bg-white">
           <input
             type="email"
             placeholder="seuemail@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
+            required
           />
         </div>
 
-        {/* Campo de senha */}
+        {/* Senha */}
         <div className="flex items-center border border-gray-400 rounded-lg px-3 py-2 bg-white">
-          {/* <Lock className="w-5 h-5 text-gray-500 mr-2" /> */}
           <input
             type="password"
             placeholder="•••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
+            required
           />
         </div>
 
-        {/* Botão principal */}
+        {/* Mensagens */}
+        {error && <p className="text-red-500 text-sm text-center font-medium">{error}</p>}
+        {success && <p className="text-green-600 text-sm text-center font-medium">{success}</p>}
+
+        {/* Botão */}
         <button
-          type="button"
+          type="submit"
+          disabled={loading}
           className="w-full bg-gradient-to-r from-sky-400 to-sky-500 text-white py-2 rounded-lg font-semibold shadow-md hover:opacity-90 transition"
         >
-          Cadastre-se →
+          {loading ? "Cadastrando..." : "Cadastre-se →"}
         </button>
       </form>
 
-      {/* Link para login */}
       <p className="text-sm text-gray-600 mt-5">
         Já possui uma conta?{" "}
         <Link
